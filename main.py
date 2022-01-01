@@ -1,13 +1,18 @@
 from PIL import Image
+import os
 from import_photos import return_timestamp
 from sort_images import group_images
 from match_images import CompareImage
 from face_detection import find_faces
-import os
+from detect_blink import detect_blink
+from convert_heic_to_jpg import convert_heic_to_jpeg
 
 #if __name__ == '__main__':
 basepath = "images/"
 images = os.listdir(basepath)
+
+# Convert HEIC images to jpeg, while keeping timestamp intact
+convert_heic_to_jpeg(basepath)
 
 #Create dictonary with paths and timestamps
 imgs = []
@@ -20,14 +25,14 @@ good, bad = return_timestamp(imgs)
 image_df = group_images(good)
 
 #For groups, assign whether images are similar or not
-comparison = CompareImage("images/esben_full.jpg", "images/IMG_1257_scaled.jpg")
+comparison = CompareImage("images/blurry.jpg", "images/tester.jpg")
 comparison.compare_image()
 
 #For similar images, find faces
-n_faces, dict_faces = find_faces(image_location = "images/test.jpg")
+n_faces, dict_faces = find_faces(image_location = "images/blurry.jpg")
 
-#Display faces
-img = dict_faces.get('face_0')
-Image.fromarray(img).show()
+#Display faces and detect blink
+img = dict_faces.get('face_1')
+# Image.fromarray(img).show()
 
-face = img
+detect_blink(img, EYE_AR_THRESH= 0.20, show_image=True)

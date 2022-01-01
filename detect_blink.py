@@ -1,4 +1,5 @@
 # import the necessary packages
+from PIL import Image
 from scipy.spatial import distance as dist
 from imutils import face_utils
 import dlib
@@ -18,50 +19,52 @@ def eye_aspect_ratio(eye):
 	# return the eye aspect ratio
 	return ear
 
-# define two constants, one for the eye aspect ratio to indicate
-# blink and then a second constant for the number of consecutive
-# frames the eye must be below the threshold
-EYE_AR_THRESH = 0.3
-# initialize the frame counters and the total number of blinks
+def detect_blink(face, EYE_AR_THRESH = 0.3, show_image = False):
+	# define two constants, one for the eye aspect ratio to indicate
+	# blink and then a second constant for the number of consecutive
+	# frames the eye must be below the threshold
 
-# grab the indexes of the facial landmarks for the left and
-# right eye, respectively
-(lStart, lEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
-(rStart, rEnd) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
+	# initialize the frame counters and the total number of blinks
 
-predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
+	# grab the indexes of the facial landmarks for the left and
+	# right eye, respectively
+	(lStart, lEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
+	(rStart, rEnd) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
 
-#Turn into gray (face = img from main)
-gray = cv2.cvtColor(face, cv2.COLOR_BGR2GRAY)
+	predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 
-#Get coordinates and turn into react
-xcoor_max = numpy.shape(face)[0]
-ycoor_max = numpy.shape(face)[1]
-rect = dlib.rectangle(0, 0, ycoor_max, xcoor_max, )
+	#Turn into gray
+	gray = cv2.cvtColor(face, cv2.COLOR_BGR2GRAY)
 
-# determine the facial landmarks for the face region, then
-# convert the facial landmark (x, y)-coordinates to a NumPy
-# array
-shape = predictor(gray, rect)
-shape = face_utils.shape_to_np(shape)
-# extract the left and right eye coordinates, then use the
-# coordinates to compute the eye aspect ratio for both eyes
-leftEye = shape[lStart:lEnd]
-rightEye = shape[rStart:rEnd]
-leftEAR = eye_aspect_ratio(leftEye)
-rightEAR = eye_aspect_ratio(rightEye)
-# average the eye aspect ratio together for both eyes
-ear = (leftEAR + rightEAR) / 2.0
+	#Get coordinates and turn into react
+	xcoor_max = numpy.shape(face)[0]
+	ycoor_max = numpy.shape(face)[1]
+	rect = dlib.rectangle(0, 0, ycoor_max, xcoor_max, )
 
-#Draw around the eyes
-leftEyeHull = cv2.convexHull(leftEye)
-rightEyeHull = cv2.convexHull(rightEye)
-cv2.drawContours(face, [leftEyeHull], -1, (0, 255, 0), 1)
-cv2.drawContours(face, [rightEyeHull], -1, (0, 255, 0), 1)
+	# determine the facial landmarks for the face region, then
+	# convert the facial landmark (x, y)-coordinates to a NumPy
+	# array
+	shape = predictor(gray, rect)
+	shape = face_utils.shape_to_np(shape)
+	# extract the left and right eye coordinates, then use the
+	# coordinates to compute the eye aspect ratio for both eyes
+	leftEye = shape[lStart:lEnd]
+	rightEye = shape[rStart:rEnd]
+	leftEAR = eye_aspect_ratio(leftEye)
+	rightEAR = eye_aspect_ratio(rightEye)
+	# average the eye aspect ratio together for both eyes
+	ear = (leftEAR + rightEAR) / 2.0
 
-Image.fromarray(face).show()
+	#Draw around the eyes
+	leftEyeHull = cv2.convexHull(leftEye)
+	rightEyeHull = cv2.convexHull(rightEye)
+	cv2.drawContours(face, [leftEyeHull], -1, (0, 255, 0), 1)
+	cv2.drawContours(face, [rightEyeHull], -1, (0, 255, 0), 1)
 
-if ear < EYE_AR_THRESH:
-	print("Eyes are closed")
-else:
-	print("Eyes are open")
+	if show_image:
+		Image.fromarray(face).show()
+
+	if ear < EYE_AR_THRESH:
+		return print("closed eyes")
+	else:
+		return print("open eyes")
