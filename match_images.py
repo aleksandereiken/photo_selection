@@ -15,7 +15,7 @@ class CompareImage(object):
         if commutative_image_diff < self.minimum_commutative_image_diff:
             print(f"Matched with commutative_image_diff of {commutative_image_diff}")
             return True
-        return False #
+        else: return False
 
     @staticmethod
     def get_image_difference(image_1, image_2):

@@ -24,7 +24,7 @@ comparison = CompareImage("images/esben_full.jpg", "images/IMG_1257_scaled.jpg")
 comparison.compare_image()
 
 #For similar images, find faces
-n_faces, dict_faces = find_faces(image_location = "images/malou_1.jpg")
+n_faces, dict_faces = find_faces(image_location = "images/test.jpg")
 
 #Display faces
 img = dict_faces.get('face_0')

@@ -31,7 +31,7 @@ EYE_AR_THRESH = 0.3
 
 predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 
-#Turn into gray
+#Turn into gray (face = img from main)
 gray = cv2.cvtColor(face, cv2.COLOR_BGR2GRAY)
 
 #Get coordinates and turn into react
