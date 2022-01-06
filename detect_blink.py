@@ -20,12 +20,6 @@ def eye_aspect_ratio(eye):
 	return ear
 
 def detect_blink(face, EYE_AR_THRESH = 0.3, show_image = False):
-	# define two constants, one for the eye aspect ratio to indicate
-	# blink and then a second constant for the number of consecutive
-	# frames the eye must be below the threshold
-
-	# initialize the frame counters and the total number of blinks
-
 	# grab the indexes of the facial landmarks for the left and
 	# right eye, respectively
 	(lStart, lEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
@@ -52,19 +46,19 @@ def detect_blink(face, EYE_AR_THRESH = 0.3, show_image = False):
 	rightEye = shape[rStart:rEnd]
 	leftEAR = eye_aspect_ratio(leftEye)
 	rightEAR = eye_aspect_ratio(rightEye)
-	# average the eye aspect ratio together for both eyes
-	ear = (leftEAR + rightEAR) / 2.0
 
-	#Draw around the eyes
-	leftEyeHull = cv2.convexHull(leftEye)
-	rightEyeHull = cv2.convexHull(rightEye)
-	cv2.drawContours(face, [leftEyeHull], -1, (0, 255, 0), 1)
-	cv2.drawContours(face, [rightEyeHull], -1, (0, 255, 0), 1)
+	# Select eye with maximum value
+	ear = max(leftEAR, rightEAR)
 
 	if show_image:
+		# Draw around the eyes
+		leftEyeHull = cv2.convexHull(leftEye)
+		rightEyeHull = cv2.convexHull(rightEye)
+		cv2.drawContours(face, [leftEyeHull], -1, (0, 255, 0), 1)
+		cv2.drawContours(face, [rightEyeHull], -1, (0, 255, 0), 1)
 		Image.fromarray(face).show()
 
 	if ear < EYE_AR_THRESH:
-		return print("closed eyes")
+		return ear
 	else:
-		return print("open eyes")
+		return EYE_AR_THRESH

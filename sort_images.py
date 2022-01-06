@@ -2,7 +2,7 @@ import pandas as pd
 from datetime import datetime
 import math
 
-def group_images(pics_dict, seconds_between_groups = 10):
+def group_images(pics_dict, seconds_between_groups = 15):
     '''
     :param pics_dict: dictionary with full file paths to pictures and matching timestamps
     :param seconds_between_groups: seconds between photos allowed before switching groups
@@ -41,4 +41,4 @@ def group_images(pics_dict, seconds_between_groups = 10):
     df_sorted["group"] = assignment
 
     #Select relevant columns
-    return df_sorted[df_sorted.columns[[0,2,5]].tolist()]
+    return df_sorted[df_sorted.columns[[0,2,5]].tolist()].reset_index(drop=True)

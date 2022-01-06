@@ -1,6 +1,7 @@
 import face_recognition
 import cv2
 import os
+from PIL import Image
 
 def find_faces(image_location, path_of_saved_image = None, save_images = False):
     '''
@@ -13,7 +14,7 @@ def find_faces(image_location, path_of_saved_image = None, save_images = False):
     new_image_path = os.path.splitext(image_location)[0] + "_reduced.jpg"
     # Create scaled image to increase speed
     fixed_height = 1000
-    img = cv2.imread(image_location, cv2.IMREAD_UNCHANGED)
+    img = cv2.imread(image_location, cv2.IMREAD_COLOR)
     height_percent = (fixed_height / float(img.shape[0]))
     width_size = int((float(img.shape[1]) * float(height_percent)))
     dim = (width_size,fixed_height)
@@ -22,6 +23,7 @@ def find_faces(image_location, path_of_saved_image = None, save_images = False):
 
     # Load the jpg file into a numpy array
     image = face_recognition.load_image_file(new_image_path)
+    # Image.fromarray(img).show()
 
     # Find all the faces in the image using a pre-trained convolutional neural network.
     # This method is more accurate than the default HOG model, but it's slower

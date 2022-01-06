@@ -21,16 +21,20 @@ def convert_heic_to_jpeg(dir_of_interest):
                 image = Image.open(dir_of_interest + "/" + filename)
                 image_exif = image.getexif()
                 if image_exif:
-                        # Make a map with tag names
+                        # Make a map with tag names and grab the datetime
                         exif = { ExifTags.TAGS[k]: v for k, v in image_exif.items() if k in ExifTags.TAGS and type(v) is not bytes }
-                        # Grab the date
-                        date_obj = datetime.strptime(exif['DateTime'], '%Y:%m:%d %H:%M:%S')
-                        # print(date_obj)
+                        date = datetime.strptime(exif['DateTime'], '%Y:%m:%d %H:%M:%S')
+
+                        # Load exif data via piexif
                         exif_dict = piexif.load(image.info["exif"])
-                        exif_dict["0th"][piexif.ImageIFD.DateTime] = date_obj.strftime("%Y:%m:%d %H:%M:%S")
+
+                        # Update exif data with orientation and datetime
+                        exif_dict["0th"][piexif.ImageIFD.DateTime] = date.strftime("%Y:%m:%d %H:%M:%S")
                         exif_dict["0th"][piexif.ImageIFD.Orientation] = 1
                         exif_bytes = piexif.dump(exif_dict)
-                        image.save(dir_of_interest + "/" + os.path.splitext(filename)[0] + ".jpg", "jpeg", exif=exif_bytes)
+
+                        # Save image as jpeg
+                        image.save(dir_of_interest + "/" + os.path.splitext(filename)[0] + ".jpg", "jpeg", exif= exif_bytes)
                 else:
-                        print(f"Unable to get date from exif for {filename}")
+                        print(f"Unable to get exif data for {filename}")
 
