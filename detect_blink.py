@@ -5,6 +5,7 @@ from imutils import face_utils
 import dlib
 import cv2
 import numpy
+import face_recognition
 
 def eye_aspect_ratio(eye):
 	# compute the euclidean distances between the two sets of
@@ -20,45 +21,35 @@ def eye_aspect_ratio(eye):
 	return ear
 
 def detect_blink(face, EYE_AR_THRESH = 0.3, show_image = False):
-	# grab the indexes of the facial landmarks for the left and
-	# right eye, respectively
-	(lStart, lEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
-	(rStart, rEnd) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
-
-	predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 
 	#Turn into gray
 	gray = cv2.cvtColor(face, cv2.COLOR_BGR2GRAY)
 
-	#Get coordinates and turn into react
-	xcoor_max = numpy.shape(face)[0]
-	ycoor_max = numpy.shape(face)[1]
-	rect = dlib.rectangle(0, 0, ycoor_max, xcoor_max, )
+	### face_recognition library
+	landmarks = face_recognition.face_landmarks(gray)
+	if landmarks:
+		leftEye = numpy.asarray(landmarks[0]["left_eye"])
+		rightEye = numpy.asarray(landmarks[0]["right_eye"])
 
-	# determine the facial landmarks for the face region, then
-	# convert the facial landmark (x, y)-coordinates to a NumPy
-	# array
-	shape = predictor(gray, rect)
-	shape = face_utils.shape_to_np(shape)
-	# extract the left and right eye coordinates, then use the
-	# coordinates to compute the eye aspect ratio for both eyes
-	leftEye = shape[lStart:lEnd]
-	rightEye = shape[rStart:rEnd]
-	leftEAR = eye_aspect_ratio(leftEye)
-	rightEAR = eye_aspect_ratio(rightEye)
+		leftEAR = eye_aspect_ratio(leftEye)
+		rightEAR = eye_aspect_ratio(rightEye)
 
-	# Select eye with maximum value
-	ear = max(leftEAR, rightEAR)
+		# Select average eye value
+		ear = (leftEAR + rightEAR) / 2
 
-	if show_image:
-		# Draw around the eyes
-		leftEyeHull = cv2.convexHull(leftEye)
-		rightEyeHull = cv2.convexHull(rightEye)
-		cv2.drawContours(face, [leftEyeHull], -1, (0, 255, 0), 1)
-		cv2.drawContours(face, [rightEyeHull], -1, (0, 255, 0), 1)
-		Image.fromarray(face).show()
+		if show_image:
+			# Draw around the eyes
+			leftEyeHull = cv2.convexHull(leftEye)
+			rightEyeHull = cv2.convexHull(rightEye)
+			cv2.drawContours(face, [leftEyeHull], -1, (0, 255, 0), 1)
+			cv2.drawContours(face, [rightEyeHull], -1, (0, 255, 0), 1)
+			Image.fromarray(face).show()
 
-	if ear < EYE_AR_THRESH:
-		return ear
+		if ear < EYE_AR_THRESH:
+			return ear
+		else:
+			return EYE_AR_THRESH
+
 	else:
-		return EYE_AR_THRESH
+		print("No landmarks detected, probably closed eyes")
+		return 0

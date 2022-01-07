@@ -11,6 +11,8 @@ from detect_blur import detect_blur
 from other_functions import show_image
 import cv2
 import shutil
+import pandas as pd
+pd.set_option("display.max_rows", None, "display.max_columns", None)
 
 #if __name__ == '__main__':
 basepath = "subtests/"
@@ -71,8 +73,8 @@ while index < (len(image_df)-1):
                 next_image = cur_gr_df_with_subgr["file_names"][row +1]
 
                 # Are there any faces in the picture?
-                n_faces_com, dict_faces_com = find_faces(image_location=comp_img)
-                n_faces_1, dict_faces_1 = find_faces(image_location=next_image)
+                n_faces_com, dict_faces_com = find_faces(image_location=comp_img, pix_to_add_to_border= 50) #)
+                n_faces_1, dict_faces_1 = find_faces(image_location=next_image, pix_to_add_to_border= 50)
                 diff = n_faces_com - n_faces_1
 
                 # Ensure there are faces in the pictures
@@ -88,7 +90,7 @@ while index < (len(image_df)-1):
                             #Display faces and detect blink
                             face_com = dict_faces_com.get('face_' + index_faces.__str__())
                             img_1 = dict_faces_1.get('face_' + index_faces.__str__())
-                            # Image.fromarray(img_1).show()
+                            # Image.fromarray(face_com).show()
 
                             blur_com = detect_blur(face_com)
                             blur_1 = detect_blur(img_1)
@@ -194,5 +196,3 @@ for image in keep:
 # textfile.close()
 # img_path_1 = 'subtests/gr_13_1_keep.JPG'
 # img_path_2 = 'subtests/gr_3_2.JPG'
-#
-# image_matching(img_path_1, img_path_2)
