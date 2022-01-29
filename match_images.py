@@ -21,10 +21,10 @@ def image_matching(img_path_1, img_path_2, cutoff=300, n_matches=20, show_matche
         other_functions.show_image(match_img)
 
     if sum < cutoff:
-        print(f"Matches with sum of distance sum of {sum}")
+        print(f"\tMatches with sum of distance sum of {sum}")
         return True
     else:
-        print(f"No matches with sum of distance sum of {sum}")
+        print(f"\tNo matches with sum of distance sum of {sum}")
         return False
 
 def image_matching_from_PIL_img(img1, img2, cutoff=300, n_matches=20, show_matches=False):
